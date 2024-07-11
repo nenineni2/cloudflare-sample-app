@@ -84,7 +84,7 @@ router.post('/', async (request, env) => {
                     type: 2,
                     label: "🎉 Enter 🎉",
                     style: 5,
-                    url: "https://example.com/"
+                    url: "https://giveaway-ao2.pages.dev/"
                   }
                 ]
 
