@@ -8,8 +8,7 @@ import {
   InteractionType,
   verifyKey,
 } from 'discord-interactions';
-import {INVITE_COMMAND, HI_COMMAND } from './commands.js';
-import { getCuteUrl } from './reddit.js';
+import { INVITE_COMMAND, HI_COMMAND, GIVEAWAY_COMMAND } from './commands.js';
 import { InteractionResponseFlags } from 'discord-interactions';
 
 class JsonResponse extends Response {
@@ -40,16 +39,13 @@ router.get('/', (request, env) => {
  * https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object
  */
 router.post('/', async (request, env) => {
-  console.log("handling post");
   const { isValid, interaction } = await server.verifyDiscordRequest(
     request,
     env,
   );
   if (!isValid || !interaction) {
-    console.log("Invalid")
     return new Response('Bad request signature.', { status: 401 });
   }
-console.log("Before cmds")
   if (interaction.type === InteractionType.PING) {
     // The `PING` message is used during the initial webhook handshake, and is
     // required to configure the webhook in the developer portal.
@@ -57,7 +53,6 @@ console.log("Before cmds")
       type: InteractionResponseType.PONG,
     });
   }
-console.log("Still before")
   if (interaction.type === InteractionType.APPLICATION_COMMAND) {
     // console.log(interaction)
     // Most user commands will come as `APPLICATION_COMMAND`.
@@ -69,6 +64,33 @@ console.log("Still before")
           data: {
             content: "Hello!",
           },
+        });
+      }
+
+      case GIVEAWAY_COMMAND.name.toLowerCase(): {
+        console.log("Hi sent")
+        return new JsonResponse({
+          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          data: {
+            content: "@everyone Hello!",
+            allowed_mentions: {
+              parse: ["everyone"]
+            },
+            components: [
+              {
+                type: 1,
+                components: [
+                  {
+                    type: 2,
+                    label: "🎉 Enter 🎉",
+                    style: 5,
+                    url: "https://example.com/"
+                  }
+                ]
+
+              }
+            ]
+          }
         });
       }
 
@@ -84,16 +106,13 @@ console.log("Still before")
         });
       }
       default:
-        console.log("Error 400")
         return new JsonResponse({ error: 'Unknown Type' }, { status: 400 });
     }
   }
 
-  console.error('Unknown Type');
   return new JsonResponse({ error: 'Unknown Type' }, { status: 400 });
 });
 router.all('*', () => {
-  console.log("Not foud");
   return new Response('Not Found.', { status: 404 })
 });
 

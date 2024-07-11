@@ -12,3 +12,8 @@ export const HI_COMMAND = {
   name: 'hi',
   description: 'Hello!',
 };
+
+export const GIVEAWAY_COMMAND = {
+  name: 'giveaway',
+  description: 'Create a giveaway',
+};
